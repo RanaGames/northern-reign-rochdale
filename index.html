@@ -840,6 +840,8 @@ button:focus-visible{outline:2px solid #efd084;outline-offset:2px;}
 #bootScreen .logoSub,#menuScreen .logoSub{color:#d9bb83;letter-spacing:.16em;transform:none;text-shadow:0 3px 0 #493b25,0 8px 20px #000a;}
 html.dale-rot #bootScreen .logoTop,html.dale-rot #menuScreen .logoTop{font-size:clamp(24px,6vh,48px);}
 </style>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#111418">
 </head>
 <body class="noselect tasks-collapsed">
 <!-- GAME ROOT: everything visual lives inside #root so the rotated
@@ -1929,12 +1931,12 @@ window.__HOME47=(function(){
  H.hasAnchor=hasAnchor;
  H.world=function(s){var a=R1A(s.area);return{x:s.lx+a.dx,z:s.lz+a.dz};};
  try{
-  var off=null;try{off=localStorage.getItem('reign.homeChoiceEnabled.v1');}catch(e){}
+  var off=null;try{off=localStorage.getItem('dale.homeChoiceEnabled.v1');}catch(e){}
   if(off==='0'){H.enabled=false;return H;}
   var pick=null,src=null;
-  try{var st=localStorage.getItem('reign.homeChoice.v1');if(st){pick=st;src='staging';H.staged=st;}}catch(e){}
+  try{var st=localStorage.getItem('dale.homeChoice.v1');if(st){pick=st;src='staging';H.staged=st;}}catch(e){}
   if(!pick&&location.hash!=='#fresh'){
-   try{var raw=localStorage.getItem('reign.save.v1');if(raw){var p=JSON.parse(raw);
+   try{var raw=localStorage.getItem('dale.save.v1');if(raw){var p=JSON.parse(raw);
     if(p&&p.version===1&&p.state&&p.state.sections&&p.state.sections.homeBase&&p.state.sections.homeBase.data&&typeof p.state.sections.homeBase.data.siteId==='string'){pick=p.state.sections.homeBase.data.siteId;src='section';}}}catch(e){}
   }
   if(pick){
@@ -2582,7 +2584,7 @@ ground2.rotation.x=-Math.PI/2; ground2.position.set(WORLD2.cx,0.15,WORLD2.cz); s
 /* v30.73: graphics-pass gate for the boot-time texture generators —
    read once here (kill key + pref); the __GX73 layer owns the toggle
    and mirrors it to localStorage dale.graphicsPassEnabled.v1. */
-var GX73TEX=(function(){try{if(localStorage.getItem('reign.graphicsPassEnabled.v1')==='0')return false;if(typeof S!=='undefined'&&S&&S.ui&&S.ui.graphicsPass===0)return false;}catch(e){}return true;})();
+var GX73TEX=(function(){try{if(localStorage.getItem('dale.graphicsPassEnabled.v1')==='0')return false;if(typeof S!=='undefined'&&S&&S.ui&&S.ui.graphicsPass===0)return false;}catch(e){}return true;})();
 var buildings=[];
 var P5_BUILD=[]; /* Phase 5: building registry (visual only) for night window lights */
 var bMeshes=[]; /* Phase 1: mesh registry for camera-occlusion fading */
@@ -4866,10 +4868,10 @@ var RM={ok:false,err:null,tris:0,mats:null,figs:[]};
 var RM_G=null;
 var RM_WANT=['Pelvis','Chest','Head','UpperArm_L','Forearm_L','Thigh_L','Shin_L','Foot_L','UpperArm_R','Forearm_R','Thigh_R','Shin_R','Foot_R'];
 var RM_TRIS=2984;
-function rmStoreOff(){try{return localStorage.getItem('reign.roadmanEnabled.v1')==='0';}catch(e){return false;}}
+function rmStoreOff(){try{return localStorage.getItem('dale.roadmanEnabled.v1')==='0';}catch(e){return false;}}
 function rmOn(){return !!roadmanEnabled&&!rmStoreOff()&&!(typeof S!=='undefined'&&S&&S.ui&&S.ui.roadman===0);}
 function rmSetPref(on){try{if(typeof S!=='undefined'&&S&&S.ui)S.ui.roadman=on?1:0;}catch(e){}
- try{localStorage.setItem('reign.roadmanEnabled.v1',on?'1':'0');}catch(e){}}
+ try{localStorage.setItem('dale.roadmanEnabled.v1',on?'1':'0');}catch(e){}}
 /* ---------- payload parser (the shipped mini-parser pattern, per-primitive materials — hmParseGLB's copy) ---------- */
 function rmParseGLB(b64){
  var bin=atob(b64),bytes=new Uint8Array(bin.length);
@@ -15327,7 +15329,7 @@ if(typeof SEATS!=='undefined'&&SEATS.panamera==null){SEATS.panamera=2;}
 (function(){
  'use strict';
  var saveSystemEnabled=true;
- var SV_KEY='reign.save.v1';
+ var SV_KEY='dale.save.v1';
  var SV={alive:false,restored:false,wipedFresh:false,hasSave:false,saveDay:0,
          saves:0,lastSaveAt:0,lastReason:'',saveBytes:0,err:null};
  function svIsObj(o){return !!o&&typeof o==='object'&&!Array.isArray(o);}
@@ -17288,7 +17290,7 @@ if(typeof SEATS!=='undefined'&&SEATS.panamera==null){SEATS.panamera=2;}
    this layer (a) restores its section by reading the stored payload
    directly at boot (after __SAVE35's own restore; order-independent,
    read-only), and (b) keeps the stored section LIVE by a narrowly
-   scoped localStorage.setItem interceptor for the 'reign.save.v1'
+   scoped localStorage.setItem interceptor for the 'dale.save.v1'
    key only, which replaces sections.npcMemory with the serialised
    live store at write time. The save module's code is not modified;
    a pre-v30.39 save (no npcMemory section) restores as empty memory,
@@ -17454,7 +17456,7 @@ var npcMemoryEnabled=true; /* spec S3 feature flag (default ON) */
     are not its concern) */
  function nmBootRestore(){
   try{
-   var raw=localStorage.getItem('reign.save.v1');if(!raw)return;
+   var raw=localStorage.getItem('dale.save.v1');if(!raw)return;
    var p=JSON.parse(raw);
    if(p&&p.version===1&&p.state&&p.state.sections&&p.state.sections.npcMemory){
     var sec=p.state.sections.npcMemory;
@@ -17468,7 +17470,7 @@ var npcMemoryEnabled=true; /* spec S3 feature flag (default ON) */
    var st=localStorage.setItem;
    if(st.__nm39Wrapped)return;
    var wrapped=function(k,v){
-    if(k==='reign.save.v1'&&typeof v==='string'&&NM&&NM.ready&&npcMemoryEnabled!==undefined){
+    if(k==='dale.save.v1'&&typeof v==='string'&&NM&&NM.ready&&npcMemoryEnabled!==undefined){
      try{
       var p=JSON.parse(v);
       if(p&&p.version===1&&p.state&&typeof p.state==='object'){
@@ -17810,7 +17812,7 @@ var npcMemoryEnabled=true; /* spec S3 feature flag (default ON) */
    var npcs={},amb=0,ambNpcs=0,i;
    for(var k in NM.store){var d=nmDisposition(k);npcs[k]={count:NM.store[k].length,disposition:d.label,score:d.score};}
    if(typeof peds!=='undefined')for(i=0;i<peds.length;i++)if(peds[i].__nm39&&peds[i].__nm39.recs.length){ambNpcs++;amb+=peds[i].__nm39.recs.length;}
-   var stored=-1;try{var raw=localStorage.getItem('reign.save.v1');stored=raw?raw.length:0;}catch(e){}
+   var stored=-1;try{var raw=localStorage.getItem('dale.save.v1');stored=raw?raw.length:0;}catch(e){}
    return {initialised:true,enabled:npcMemoryEnabled,version:'v30.39',restored:NM.restored,
     counts:NM.counts,npcs:npcs,ambient:{npcs:ambNpcs,records:amb},
     lastRecognition:NM.lastRecognition,sectionBytes:NM.sectionBytes,storedSaveBytes:stored,
@@ -18131,7 +18133,7 @@ var npcMemoryEnabled=true; /* spec S3 feature flag (default ON) */
    }
    var nm=ls6Surf('__NM39');
    if(nm&&nm.sectionInfo)out.npcMemorySectionBytes=nm.sectionInfo().bytes;
-   try{var raw=localStorage.getItem('reign.save.v1');out.storedBytes=raw?raw.length:0;}catch(e){}
+   try{var raw=localStorage.getItem('dale.save.v1');out.storedBytes=raw?raw.length:0;}catch(e){}
   }catch(e){out.ok=false;out.issues.push(String(e&&e.message||e));}
   return out;
  }
@@ -18263,7 +18265,7 @@ var PF89={version:'pf89-1',err:null,grid:null,gridLen:-1,gridCells:0,builds:0,
  parses:0,regHits:0,regBypass:0,hudWrites:0,hudSkips:0,rivalWrites:0,rivalSkips:0,
  gateSkips:0,lastStock:null,lastRival:null};
 var PF89REG={};
-function pf89StoreOff(){try{return localStorage.getItem('reign.perfPass.v1')==='0';}catch(e){return false;}}
+function pf89StoreOff(){try{return localStorage.getItem('dale.perfPass.v1')==='0';}catch(e){return false;}}
 function pf89On(){
  if(!perfPassEnabled)return false;
  if(pf89StoreOff())return false;
@@ -18271,7 +18273,7 @@ function pf89On(){
  return true;
 }
 function pf89SetPref(on){try{if(typeof S!=='undefined'&&S){if(!S.ui||typeof S.ui!=='object')S.ui={};S.ui.perfPass=on?1:0;}}catch(e){}
- try{localStorage.setItem('reign.perfPass.v1',on?'1':'0');}catch(e){}}
+ try{localStorage.setItem('dale.perfPass.v1',on?'1':'0');}catch(e){}}
 function pf89SettingsOpen(){var p=document.getElementById('settingsPanel');return !!(p&&p.classList.contains('on'));}
 function pf89GateSettings(){ /* true = skip this settings sync tick */
  if(!pf89On())return false;
@@ -19457,7 +19459,7 @@ var advancedFightingEnabled=true; /* spec section 3 feature flag (default ON) */
    throw leaves the shipped game untouched. */
 (function(){try{
  var H=window.__HOME47;if(!H)return;
- var STAGE_KEY='reign.homeChoice.v1',FLAG_KEY='reign.homeChoiceEnabled.v1',REOPEN_KEY='reign.homePicker.v1';
+ var STAGE_KEY='dale.homeChoice.v1',FLAG_KEY='dale.homeChoiceEnabled.v1',REOPEN_KEY='dale.homePicker.v1';
  function $(id){return document.getElementById(id);}
  function areaRow(id){for(var i=0;i<AREAS.length;i++)if(AREAS[i].id===id)return AREAS[i];return null;}
  H.setEnabled=function(on){try{localStorage.setItem(FLAG_KEY,on?'1':'0');}catch(e){}H.enabled=!!on;return H.enabled;};
@@ -19473,7 +19475,7 @@ var advancedFightingEnabled=true; /* spec section 3 feature flag (default ON) */
     away. Pass-through: the stored payload is never altered here. */
  var _prevSet=localStorage.setItem;
  localStorage.setItem=function(k,v){var r=_prevSet.call(localStorage,k,v);
-  try{if(k==='reign.save.v1'&&H.staged){var p=JSON.parse(v);
+  try{if(k==='dale.save.v1'&&H.staged){var p=JSON.parse(v);
    if(p&&p.state&&p.state.sections&&p.state.sections.homeBase&&p.state.sections.homeBase.data&&p.state.sections.homeBase.data.siteId===H.staged){localStorage.removeItem(STAGE_KEY);H.staged=null;H.folded=true;}}}catch(e){}
   return r;};
  /* text: safe-screen title + the lines that named Deeplish as home */
@@ -19930,7 +19932,7 @@ catch(e){
 'use strict';
 var multiplayerTestEnabled=false;
 var MP_URL_DEFAULT='wss://kings-and-dice-server.onrender.com';
-var MP_PREF_KEY='reign.mpTest.v1';
+var MP_PREF_KEY='dale.mpTest.v1';
 var MP={
  on:false,ws:null,id:null,room:null,status:'off',name:'',url:MP_URL_DEFAULT,
  peers:{},pending:{},intentional:false,reconnectT:null,
@@ -22646,7 +22648,7 @@ function ct59PatrolPhase(){
   var cn=roadNearOn(milk,409,1124);var cp=pathPoint(milk.pts,cn.t);var co=perp(cp.x,cp.z,cp.dx,cp.dz,-24);
   lmAdd(co.x,co.z,'#ff9f43','CHUNKY CHICKEN');
   var mn=roadNearOn(milk,da.x,da.z);var mp=pathPoint(milk.pts,mn.t);
-  var gx73Lm=false;try{gx73Lm=localStorage.getItem('reign.graphicsPassEnabled.v1')!=='0'&&!(typeof S!=='undefined'&&S&&S.ui&&S.ui.graphicsPass===0);}catch(e){gx73Lm=true;} /* v30.73 gate, read fresh at spawn */
+  var gx73Lm=false;try{gx73Lm=localStorage.getItem('dale.graphicsPassEnabled.v1')!=='0'&&!(typeof S!=='undefined'&&S&&S.ui&&S.ui.graphicsPass===0);}catch(e){gx73Lm=true;} /* v30.73 gate, read fresh at spawn */
   var cand=[{x:mp.x+95,z:mp.z},perp(mp.x,mp.z,mp.dx,mp.dz,95),perp(mp.x,mp.z,mp.dx,mp.dz,-95)],mc=null;
   for(i=0;i<cand.length;i++){if(!onRoad(cand[i].x,cand[i].z,6)&&!footBlocked(cand[i].x,cand[i].z)){mc=cand[i];break;}}
   if(!mc)mc=cand[0];
@@ -23241,14 +23243,14 @@ var interface60Enabled=true; /* v30.60 master flag (default ON) */
  window.addEventListener('keydown',function(e){if(IF.free){e.stopImmediatePropagation();e.preventDefault();}},true);
  window.addEventListener('keyup',function(e){if(IF.free){e.stopImmediatePropagation();e.preventDefault();}},true);
  /* ================= piece 3: UI remove ================= */
- function prefsRead(){try{var r=localStorage.getItem('reign.hudPrefs.v1');return r?JSON.parse(r):{};}catch(e){return {};}}
+ function prefsRead(){try{var r=localStorage.getItem('dale.hudPrefs.v1');return r?JSON.parse(r):{};}catch(e){return {};}}
  function prefsWrite(){
   try{
-   var raw=localStorage.getItem('reign.hudPrefs.v1');
+   var raw=localStorage.getItem('dale.hudPrefs.v1');
    var o=raw?JSON.parse(raw):{};
    o.uiHidden60=IF.hidden.slice();o.uiGhost60=IF.ghosts;
    var s=JSON.stringify(o);
-   if(s!==raw)localStorage.setItem('reign.hudPrefs.v1',s);
+   if(s!==raw)localStorage.setItem('dale.hudPrefs.v1',s);
   }catch(e){}
  }
  function prefsLoad(){
@@ -24649,7 +24651,7 @@ var charRacesEnabled=true; /* v30.64 master character-races flag (default ON) */
     if(window.__SAVE35&&__SAVE35.status){
      var stt=__SAVE35.status();
      if(stt.restored&&!CR.restoredApplied){CR.restoredApplied=true;
-      try{var raw=localStorage.getItem('reign.save.v1');if(raw){var pv=JSON.parse(raw);if(pv&&pv.state&&pv.state.sections&&pv.state.sections.charRaces)loadSection(pv.state.sections.charRaces.data);}}catch(e){}
+      try{var raw=localStorage.getItem('dale.save.v1');if(raw){var pv=JSON.parse(raw);if(pv&&pv.state&&pv.state.sections&&pv.state.sections.charRaces)loadSection(pv.state.sections.charRaces.data);}}catch(e){}
      }
      if(stt.wipedFresh&&!CR.recDirty){CR.rec=recSan(null);}
     }
@@ -25381,13 +25383,13 @@ if(!window.__MS66){
 (function(){
  'use strict';
  var MS={version:'ms66-1',err:null,done:false,applied:null,sectionSeen:false};
- function msStoreOff(){try{return localStorage.getItem('reign.mercStarterEnabled.v1')==='0';}catch(e){return false;}}
+ function msStoreOff(){try{return localStorage.getItem('dale.mercStarterEnabled.v1')==='0';}catch(e){return false;}}
  function msOn(){return !!mercStarterEnabled&&!msStoreOff()&&!(typeof S!=='undefined'&&S&&S.ui&&S.ui.mercStarter===0);}
  function msSetPref(on){try{if(typeof S!=='undefined'&&S){if(!S.ui||typeof S.ui!=='object')S.ui={hud:1,ctl:1,mm:1,mmShow:true,feed:1,pos:{}};S.ui.mercStarter=on?1:0;}}catch(e){}
-  try{localStorage.setItem('reign.mercStarterEnabled.v1',on?'1':'0');}catch(e){}}
+  try{localStorage.setItem('dale.mercStarterEnabled.v1',on?'1':'0');}catch(e){}}
  /* the stored section, read straight from the save payload (the __CR64 read pattern) */
  function msReadSection(){
-  try{var raw=localStorage.getItem('reign.save.v1');if(!raw)return null;
+  try{var raw=localStorage.getItem('dale.save.v1');if(!raw)return null;
    var pv=JSON.parse(raw);
    if(pv&&pv.state&&pv.state.sections&&pv.state.sections.mercStarter&&pv.state.sections.mercStarter.data)return pv.state.sections.mercStarter.data;
   }catch(e){}
@@ -25538,13 +25540,13 @@ if(!window.__GR67){
  var LAPIZ=[0,0.024295850623258536,0.3154568193938017]; /* authored CarPaint factor (Lapiz Blue) */
  var LAPIZ_HEX=0x000650; /* CARS.golfb defColor: nearest hex to the authored factor */
  var IMMY_GREY=0x8a8f96; /* mid grey — Immy's tracksuit colourway */
- function grStoreOff(){try{return localStorage.getItem('reign.golfR67Enabled.v1')==='0';}catch(e){return false;}}
+ function grStoreOff(){try{return localStorage.getItem('dale.golfR67Enabled.v1')==='0';}catch(e){return false;}}
  function grOn(){return !!golfR67Enabled&&!grStoreOff()&&!(typeof S!=='undefined'&&S&&S.ui&&S.ui.golfR67===0);}
  function grSetPref(on){try{if(typeof S!=='undefined'&&S){if(!S.ui||typeof S.ui!=='object')S.ui={hud:1,ctl:1,mm:1,mmShow:true,feed:1,pos:{}};S.ui.golfR67=on?1:0;}}catch(e){}
-  try{localStorage.setItem('reign.golfR67Enabled.v1',on?'1':'0');}catch(e){}}
+  try{localStorage.setItem('dale.golfR67Enabled.v1',on?'1':'0');}catch(e){}}
  /* the stored section, read straight from the save payload (the __CR64/__MS66 read pattern) */
  function grReadSection(){
-  try{var raw=localStorage.getItem('reign.save.v1');if(!raw)return null;
+  try{var raw=localStorage.getItem('dale.save.v1');if(!raw)return null;
    var pv=JSON.parse(raw);
    if(pv&&pv.state&&pv.state.sections&&pv.state.sections.golfR67&&pv.state.sections.golfR67.data)return pv.state.sections.golfR67.data;
   }catch(e){}
@@ -25900,10 +25902,10 @@ function ilRoutePoint(s){
  return {x:a[0]+(b[0]-a[0])*f,z:a[1]+(b[1]-a[1])*f,dx:(b[0]-a[0])/seg,dz:(b[1]-a[1])/seg};
 }
 /* ---------- flag ---------- */
-function ilStoreOff(){try{return localStorage.getItem('reign.ilyToursEnabled.v1')==='0';}catch(e){return false;}}
+function ilStoreOff(){try{return localStorage.getItem('dale.ilyToursEnabled.v1')==='0';}catch(e){return false;}}
 function ilOn(){return !!ilyToursEnabled&&!ilStoreOff()&&!(typeof S!=='undefined'&&S&&S.ui&&S.ui.ilyTours===0);}
 function ilSetPref(on){try{if(typeof S!=='undefined'&&S&&S.ui)S.ui.ilyTours=on?1:0;}catch(e){}
- try{localStorage.setItem('reign.ilyToursEnabled.v1',on?'1':'0');}catch(e){}}
+ try{localStorage.setItem('dale.ilyToursEnabled.v1',on?'1':'0');}catch(e){}}
 function ilSetEnabled(on){ilyToursEnabled=!!on;ilSetPref(on);
  if(!on&&IL.phase==='tour')ilAbort('flag');
  var st=document.getElementById('il68SetState');if(st)st.textContent=on?'On':'Off';
@@ -26532,10 +26534,10 @@ if(!window.__RD69){ (function(){
  ];
  var RD={cur:-1,sel:-1,unavail:{},panel:false,built:false,loadT:0,daySeen:-1,err:''};
  /* ---------- flag (the family idiom) ---------- */
- function rdStoreOff(){try{return localStorage.getItem('reign.carRadioEnabled.v1')==='0';}catch(e){return false;}}
+ function rdStoreOff(){try{return localStorage.getItem('dale.carRadioEnabled.v1')==='0';}catch(e){return false;}}
  function rdOn(){return !!carRadioEnabled&&!rdStoreOff()&&!(typeof S!=='undefined'&&S&&S.ui&&S.ui.carRadio===0);}
  function rdSetPref(on){try{if(typeof S!=='undefined'&&S&&S.ui)S.ui.carRadio=on?1:0;}catch(e){}
-  try{localStorage.setItem('reign.carRadioEnabled.v1',on?'1':'0');}catch(e){}}
+  try{localStorage.setItem('dale.carRadioEnabled.v1',on?'1':'0');}catch(e){}}
  function rdSetEnabled(on){carRadioEnabled=!!on;rdSetPref(on);if(!on)rdStop('flag');rdSyncChrome();}
  /* ---------- state helpers ---------- */
  function rdFoot(){return (typeof footMode!=='undefined'&&footMode)?true:false;}
@@ -26757,7 +26759,7 @@ var crewLinkUpEnabled=true; /* v30.70 master "The Mandem" flag (default ON) */
 function mlTapOnly(){
  try{
   if(!crewLinkUpEnabled)return false;
-  if(localStorage.getItem('reign.crewLinkUpEnabled.v1')==='0')return false;
+  if(localStorage.getItem('dale.crewLinkUpEnabled.v1')==='0')return false;
   if(typeof S!=='undefined'&&S&&S.ui&&S.ui.crewLinkUp===0)return false;
   return true;
  }catch(e){return false;}
@@ -26768,10 +26770,10 @@ if(!window.__ML70){ (function(){
   hits:0,witnessCalls:0,downs:[],kobe:null,bike:null,bikeMode:'parked',
   bikeRide:null,nextRideAt:0,saveSeen:false,phoneTick:0,linkBubbleCd:10};
  /* ---------------- flag (the family idiom) ---------------- */
- function mlStoreOff(){try{return localStorage.getItem('reign.crewLinkUpEnabled.v1')==='0';}catch(e){return false;}}
+ function mlStoreOff(){try{return localStorage.getItem('dale.crewLinkUpEnabled.v1')==='0';}catch(e){return false;}}
  function mlOn(){return !!crewLinkUpEnabled&&!mlStoreOff()&&!(typeof S!=='undefined'&&S&&S.ui&&S.ui.crewLinkUp===0);}
  function mlSetPref(on){try{if(typeof S!=='undefined'&&S&&S.ui)S.ui.crewLinkUp=on?1:0;}catch(e){}
-  try{localStorage.setItem('reign.crewLinkUpEnabled.v1',on?'1':'0');}catch(e){}}
+  try{localStorage.setItem('dale.crewLinkUpEnabled.v1',on?'1':'0');}catch(e){}}
  function mlSetEnabled(on){
   crewLinkUpEnabled=!!on;mlSetPref(on);
   if(!on)mlReleaseAll('flag');
@@ -27500,7 +27502,7 @@ if(!window.__ML70){ (function(){
  /* ---------------- save section ---------------- */
  function mlSaveSection(){return {group:ML.group.slice()};}
  function mlReadSection(){
-  try{var raw=localStorage.getItem('reign.save.v1');if(!raw)return null;
+  try{var raw=localStorage.getItem('dale.save.v1');if(!raw)return null;
    var pv=JSON.parse(raw);
    if(pv&&pv.state&&pv.state.sections&&pv.state.sections.mandem&&pv.state.sections.mandem.data)return pv.state.sections.mandem.data;
   }catch(e){}
@@ -27773,10 +27775,10 @@ if(!window.__RE72){ (function(){
   {road:'Norden Avenue',        end:'N',  x:-6003, z:-2188, hx:0.1071,  hz:-0.9943, w:14, cls:'S', dBar:34, police:0}
  ];
  var RE={built:false,err:null,groups:[],solids:[],tpl:null,tplErr:null,policeMeshes:[]};
- function reStoreOff(){try{return localStorage.getItem('reign.roadEndingsEnabled.v1')==='0';}catch(e){return false;}}
+ function reStoreOff(){try{return localStorage.getItem('dale.roadEndingsEnabled.v1')==='0';}catch(e){return false;}}
  function reOn(){return !!roadEndingsEnabled&&!reStoreOff()&&!(typeof S!=='undefined'&&S&&S.ui&&S.ui.roadEndings===0);}
  function reSetPref(on){try{if(typeof S!=='undefined'&&S&&S.ui)S.ui.roadEndings=on?1:0;}catch(e){}
-  try{localStorage.setItem('reign.roadEndingsEnabled.v1',on?'1':'0');}catch(e){}}
+  try{localStorage.setItem('dale.roadEndingsEnabled.v1',on?'1':'0');}catch(e){}}
  function reSetEnabled(on){roadEndingsEnabled=!!on;reSetPref(on);reApply();reSyncSettings();return reOn();}
 
  /* ---------------- canvas textures (shared) ---------------- */
@@ -28166,10 +28168,10 @@ if(!window.__GX73){ (function(){
   mosqueNew:{x:1018,z:1520},mosqueCur:null,mosqueOrig:null,mosqueMoved:false,
   snapL:-1,snapP:-1,err:null};
  try{GX.snapL=placeLabels.length;GX.snapP=markerPins.length;}catch(e){}
- function gxStoreOff(){try{return localStorage.getItem('reign.graphicsPassEnabled.v1')==='0';}catch(e){return false;}}
+ function gxStoreOff(){try{return localStorage.getItem('dale.graphicsPassEnabled.v1')==='0';}catch(e){return false;}}
  function gxOn(){return !!graphicsPassEnabled&&!gxStoreOff()&&!(typeof S!=='undefined'&&S&&S.ui&&S.ui.graphicsPass===0);}
  function gxSetPref(on){try{if(typeof S!=='undefined'&&S&&S.ui)S.ui.graphicsPass=on?1:0;}catch(e){}
-  try{localStorage.setItem('reign.graphicsPassEnabled.v1',on?'1':'0');}catch(e){}}
+  try{localStorage.setItem('dale.graphicsPassEnabled.v1',on?'1':'0');}catch(e){}}
  function gxSame(a,b){return Math.abs(a.x-b.x)<2&&Math.abs(a.z-b.z)<2;}
 
  /* ---------------- §3 the library building ---------------- */
@@ -28424,10 +28426,10 @@ if(!window.__R74){ (function(){
     manchester is contested ground: no crew). Refreshed from the
     __F30 registry's district lists when the registry is available. */
  var R74_AREA_FACTION={deeplish:'tweedale',newbold:'moss',spotland:'spotland',norden:'norden',bamford:'norden',heywood:'heywood',centre:'exchange',kingsway:'exchange',castleton:'castleton',middleton:'longstreet',manchester:null};
- function r74StoreOff(){try{return localStorage.getItem('reign.localStandingEnabled.v1')==='0';}catch(e){return false;}}
+ function r74StoreOff(){try{return localStorage.getItem('dale.localStandingEnabled.v1')==='0';}catch(e){return false;}}
  function r74On(){return !!localStandingEnabled&&!r74StoreOff()&&!(typeof S!=='undefined'&&S&&S.ui&&S.ui.localStanding===0);}
  function r74SetPref(on){try{if(typeof S!=='undefined'&&S&&S.ui)S.ui.localStanding=on?1:0;}catch(e){}
-  try{localStorage.setItem('reign.localStandingEnabled.v1',on?'1':'0');}catch(e){}}
+  try{localStorage.setItem('dale.localStandingEnabled.v1',on?'1':'0');}catch(e){}}
  function r74Clamp(v,d){v=(typeof v==='number'&&isFinite(v))?Math.round(v):d;return Math.max(0,Math.min(100,v));}
  function r74Blank(){return {r:50,t:50,f:0};}
  function r74AreaIds(){
@@ -28455,7 +28457,7 @@ if(!window.__R74){ (function(){
   R74.restored=true;
   var d=r74NewData();
   try{
-   var raw=localStorage.getItem('reign.save.v1');
+   var raw=localStorage.getItem('dale.save.v1');
    if(raw){
     var p=JSON.parse(raw),sec=(p&&p.state&&p.state.sections)?p.state.sections.localStanding:null;
     if(sec&&sec.version===1&&sec.data){
@@ -28977,10 +28979,10 @@ if(!window.__T75){ (function(){
  var T75_EVENT_CAP=4,T75_DAY_CAP=6;                        /* oscillation caps */
  var T75_CONTROL_MIN=30,T75_CONTROL_MARGIN=10;             /* hysteresis */
  var T75_AREA_FACTION={};for(var _k in T75_AREA_FACTION_FALLBACK)T75_AREA_FACTION[_k]=T75_AREA_FACTION_FALLBACK[_k];
- function t75StoreOff(){try{return localStorage.getItem('reign.territoryEnabled.v1')==='0';}catch(e){return false;}}
+ function t75StoreOff(){try{return localStorage.getItem('dale.territoryEnabled.v1')==='0';}catch(e){return false;}}
  function t75On(){return !!territoryEnabled&&!t75StoreOff()&&!(typeof S!=='undefined'&&S&&S.ui&&S.ui.territory===0);}
  function t75SetPref(on){try{if(typeof S!=='undefined'&&S&&S.ui)S.ui.territory=on?1:0;}catch(e){}
-  try{localStorage.setItem('reign.territoryEnabled.v1',on?'1':'0');}catch(e){}}
+  try{localStorage.setItem('dale.territoryEnabled.v1',on?'1':'0');}catch(e){}}
  function t75ClampInf(v){v=(typeof v==='number'&&isFinite(v))?Math.round(v):0;return Math.max(0,Math.min(100,v));}
  function t75Day(){return (typeof S!=='undefined'&&S&&typeof S.day==='number'&&isFinite(S.day))?S.day:1;}
  function t75Now(){return (typeof gameT==='number'&&isFinite(gameT))?Math.round(gameT*10)/10:0;}
@@ -29085,7 +29087,7 @@ if(!window.__T75){ (function(){
   T75.restored=true;
   var d=t75NewData();
   try{
-   var raw=localStorage.getItem('reign.save.v1');
+   var raw=localStorage.getItem('dale.save.v1');
    if(raw){
     var p=JSON.parse(raw),sec=(p&&p.state&&p.state.sections)?p.state.sections.territory:null;
     if(sec&&sec.version===1&&sec.data&&sec.data.districts){
@@ -29531,10 +29533,10 @@ if(!window.__R76){ (function(){
           triggers:{},betrayalRecords:{},obsOn:false};
  var R76_RETAIN={short:150,day:300,long:900,perm:Infinity}; /* __NM39's table */
  var R76_FORMER_ALLY=['Things ain\u2019t how they used to be.'];
- function r76StoreOff(){try{return localStorage.getItem('reign.relationshipsEnabled.v1')==='0';}catch(e){return false;}}
+ function r76StoreOff(){try{return localStorage.getItem('dale.relationshipsEnabled.v1')==='0';}catch(e){return false;}}
  function r76On(){return !!relationshipsEnabled&&!r76StoreOff()&&!(typeof S!=='undefined'&&S&&S.ui&&S.ui.relationships===0);}
  function r76SetPref(on){try{if(typeof S!=='undefined'&&S&&S.ui)S.ui.relationships=on?1:0;}catch(e){}
-  try{localStorage.setItem('reign.relationshipsEnabled.v1',on?'1':'0');}catch(e){}}
+  try{localStorage.setItem('dale.relationshipsEnabled.v1',on?'1':'0');}catch(e){}}
  function r76Clamp100(v){v=(typeof v==='number'&&isFinite(v))?Math.round(v):0;return Math.max(0,Math.min(100,v));}
  /* total game seconds — the __NM39 nmNow() formula, replicated */
  function r76Now(){
@@ -29786,7 +29788,7 @@ if(!window.__R76){ (function(){
   if(R76.restored)return;
   R76.restored=true;
   try{
-   var raw=localStorage.getItem('reign.save.v1');
+   var raw=localStorage.getItem('dale.save.v1');
    if(raw){
     var p=JSON.parse(raw),sec=(p&&p.state&&p.state.sections)?p.state.sections.relationships:null;
     if(sec&&sec.version===1&&sec.data&&sec.data.betrayal&&sec.data.betrayal.records){
@@ -30019,10 +30021,10 @@ if(!window.__EV77){ (function(){
   loyalty:{eventType:'loyalty-reference',category:'Positive',importance:2,effect:1,policy:'long'},
   contact:{eventType:'underworld-contact',category:'Positive',importance:2,effect:1,policy:'long'},
   tensionmeet:{eventType:'neighbourhood-tension',category:'Negative',importance:1,effect:-0.5,policy:'day'}};
- function evStoreOff(){try{return localStorage.getItem('reign.underworldEventsEnabled.v1')==='0';}catch(e){return false;}}
+ function evStoreOff(){try{return localStorage.getItem('dale.underworldEventsEnabled.v1')==='0';}catch(e){return false;}}
  function evOn(){return !!underworldEventsEnabled&&!evStoreOff()&&!(typeof S!=='undefined'&&S&&S.ui&&S.ui.underworldEvents===0);}
  function evSetPref(on){try{if(typeof S!=='undefined'&&S&&S.ui)S.ui.underworldEvents=on?1:0;}catch(e){}
-  try{localStorage.setItem('reign.underworldEventsEnabled.v1',on?'1':'0');}catch(e){}}
+  try{localStorage.setItem('dale.underworldEventsEnabled.v1',on?'1':'0');}catch(e){}}
  function evDay(){return (typeof S!=='undefined'&&S&&typeof S.day==='number'&&isFinite(S.day))?S.day:1;}
  function evFocus(){return (typeof footMode!=='undefined'&&footMode)?footMode:player;}
  /* ---------- ped predicates: EN37's verbal rules, mirrored ----------
@@ -30364,10 +30366,10 @@ var underworldIntegrationEnabled=true; /* v30.78 master "Underworld integration"
 if(!window.__U78){ (function(){
  'use strict';
  var U78={err:null,obsOn:false,dbgReg:false};
- function u78StoreOff(){try{return localStorage.getItem('reign.underworldIntegrationEnabled.v1')==='0';}catch(e){return false;}}
+ function u78StoreOff(){try{return localStorage.getItem('dale.underworldIntegrationEnabled.v1')==='0';}catch(e){return false;}}
  function u78On(){return !!underworldIntegrationEnabled&&!u78StoreOff()&&!(typeof S!=='undefined'&&S&&S.ui&&S.ui.underworldIntegration===0);}
  function u78SetPref(on){try{if(typeof S!=='undefined'&&S&&S.ui)S.ui.underworldIntegration=on?1:0;}catch(e){}
-  try{localStorage.setItem('reign.underworldIntegrationEnabled.v1',on?'1':'0');}catch(e){}}
+  try{localStorage.setItem('dale.underworldIntegrationEnabled.v1',on?'1':'0');}catch(e){}}
  function u78Rd(fn,dflt){try{var v=fn();return (v===undefined||v===null)?dflt:v;}catch(e){return dflt;}}
  function u78Esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
  function u78AreaName(id){
@@ -30423,7 +30425,7 @@ if(!window.__U78){ (function(){
  /* ---------------- (b) debug: the underworld section for __DBG53 ---- */
  function u78SaveSchema(){
   try{
-   var raw=localStorage.getItem('reign.save.v1');if(!raw)return null;
+   var raw=localStorage.getItem('dale.save.v1');if(!raw)return null;
    var sv=JSON.parse(raw);if(!sv||!sv.state)return null;
    var secs=sv.state.sections||{};
    var list=Object.keys(secs).sort().map(function(k){var s=secs[k];return k+' v'+(s&&s.version!==undefined?s.version:'?');}).join(', ');
@@ -30597,10 +30599,10 @@ if(!window.__HM80){
 var HM={ok:false,err:null,tris:0,fig:null,mats:null};
 var HM_G=null;
 var HM_WANT=['Pelvis','Chest','Head','UpperArm_L','Forearm_L','Thigh_L','Shin_L','Foot_L','UpperArm_R','Forearm_R','Thigh_R','Shin_R','Foot_R'];
-function hmStoreOff(){try{return localStorage.getItem('reign.heroModelEnabled.v1')==='0';}catch(e){return false;}}
+function hmStoreOff(){try{return localStorage.getItem('dale.heroModelEnabled.v1')==='0';}catch(e){return false;}}
 function hmOn(){return !!heroModelEnabled&&!hmStoreOff()&&!(typeof S!=='undefined'&&S&&S.ui&&S.ui.heroModel===0);}
 function hmSetPref(on){try{if(typeof S!=='undefined'&&S&&S.ui)S.ui.heroModel=on?1:0;}catch(e){}
- try{localStorage.setItem('reign.heroModelEnabled.v1',on?'1':'0');}catch(e){}}
+ try{localStorage.setItem('dale.heroModelEnabled.v1',on?'1':'0');}catch(e){}}
 /* ---------- payload parser (the shipped tsParseGLB pattern; per-primitive materials) ---------- */
 function hmParseGLB(b64){
  var bin=atob(b64),bytes=new Uint8Array(bin.length);
@@ -30807,6 +30809,7 @@ function hmSyncPose(fig){
   P.Shin_L.rotation.x+=(-1.25-P.Shin_L.rotation.x)*s;P.Shin_R.rotation.x+=(-1.25-P.Shin_R.rotation.x)*s;
   P.UpperArm_L.rotation.x+=(-.55-P.UpperArm_L.rotation.x)*s;P.UpperArm_R.rotation.x+=(-.55-P.UpperArm_R.rotation.x)*s;}
 }
+window.hmSyncPose=hmSyncPose; /* export: nrVehicleTick runs in global scope and calls hmSyncPose bare, like the global tsSyncPose/cmSyncPose — without this the call throws "Can't find variable: hmSyncPose" */
 var hmOrigAnim=animateFigure;
 animateFigure=function(fig,dt,speed,run,dive){
  hmOrigAnim(fig,dt,speed,run,dive);
@@ -31004,13 +31007,13 @@ if(!window.__PN83){
 (function(){
  'use strict';
  var PN={version:'pn83-1',err:null,done:false,applied:null,sectionSeen:false};
- function pnStoreOff(){try{return localStorage.getItem('reign.panamera83Enabled.v1')==='0';}catch(e){return false;}}
+ function pnStoreOff(){try{return localStorage.getItem('dale.panamera83Enabled.v1')==='0';}catch(e){return false;}}
  function pnOn(){return !!panamera83Enabled&&!pnStoreOff()&&!(typeof S!=='undefined'&&S&&S.ui&&S.ui.panamera83===0);}
  function pnSetPref(on){try{if(typeof S!=='undefined'&&S){if(!S.ui||typeof S.ui!=='object')S.ui={hud:1,ctl:1,mm:1,mmShow:true,feed:1,pos:{}};S.ui.panamera83=on?1:0;}}catch(e){}
-  try{localStorage.setItem('reign.panamera83Enabled.v1',on?'1':'0');}catch(e){}}
+  try{localStorage.setItem('dale.panamera83Enabled.v1',on?'1':'0');}catch(e){}}
  /* the stored section, read straight from the save payload (the __CR64/__MS66 read pattern) */
  function pnReadSection(){
-  try{var raw=localStorage.getItem('reign.save.v1');if(!raw)return null;
+  try{var raw=localStorage.getItem('dale.save.v1');if(!raw)return null;
    var pv=JSON.parse(raw);
    if(pv&&pv.state&&pv.state.sections&&pv.state.sections.panamera83&&pv.state.sections.panamera83.data)return pv.state.sections.panamera83.data;
   }catch(e){}
@@ -31225,10 +31228,10 @@ if(!window.__TL85){
  var TL={version:'tl85-1',alive:false,err:null,on:false,lock:null,day:0,cycles:0,locks:0,breaks:0,lastBreak:'',marker:null,btn:null,orig:null,retreatT:0,lastGT:null,awayCos:0,th0:null};
  var BREAK_RANGE=COMBAT.lockRange+25; /* shipped lock drop range + 25u margin */
  var RETREAT_COS=0.6,RETREAT_MIN=0.35,RETREAT_HOLD=0.25,RETREAT_DRIFT=0.5; /* v30.88: walking backwards cancels the lock — away-component cosine >= 0.6 of a push >= 0.35 (below the F3 block scale .45 and the F5 charge scale .40, so a full deliberate push registers even through them; above stick tremor), sustained 0.25 game-s at a STABLE bearing (drift > 0.5 rad restarts the timer: a circling opponent swinging the bearing around the player is strafing geometry, not a back-walk — proven necessary by probe88-c, where a live thug's repositioning tripped the break mid-circle) */
- function tlStoreOff(){try{return localStorage.getItem('reign.targetLock85Enabled.v1')==='0';}catch(e){return false;}}
+ function tlStoreOff(){try{return localStorage.getItem('dale.targetLock85Enabled.v1')==='0';}catch(e){return false;}}
  function tlOn(){return !!targetLock85Enabled&&!tlStoreOff()&&!(typeof S!=='undefined'&&S&&S.ui&&S.ui.targetLock85===0);}
  function tlSetPref(on){try{if(typeof S!=='undefined'&&S){if(!S.ui||typeof S.ui!=='object')S.ui={hud:1,ctl:1,mm:1,mmShow:true,feed:1,pos:{}};S.ui.targetLock85=on?1:0;}}catch(e){}
-  try{localStorage.setItem('reign.targetLock85Enabled.v1',on?'1':'0');}catch(e){}}
+  try{localStorage.setItem('dale.targetLock85Enabled.v1',on?'1':'0');}catch(e){}}
  function tlAlive(h){return !!(h&&h.o&&!h.o.down&&h.o.hp>0);}
  function tlDist(h){return dist2(player.x,player.z,h.o.x,h.o.z);}
  /* the widened people list: hostiles (combatHostiles) first, then every
@@ -31581,10 +31584,10 @@ idle:{r:15,d:1.667,f:[[0.342,0.013,-0.003,-0.284,0.479,-0.134,0.331,0.175,-0.291
  var M_ARMS=[0,1,1,1,1,1,1,0,0,0,0,0,0];   /* telegraph wind-up: arms + torso only */
  var M_KD  =[0,0,0,1,1,1,1,1,1,1,1,1,1];   /* downed: limbs only — the shipped root tip owns the fall */
  var M_IDLE=[0,1,0,1,1,1,1,0,0,0,0,0,0];   /* combat idle: arms + lean */
- function faStoreOff(){try{return localStorage.getItem('reign.fightAnimEnabled.v1')==='0';}catch(e){return false;}}
+ function faStoreOff(){try{return localStorage.getItem('dale.fightAnimEnabled.v1')==='0';}catch(e){return false;}}
  function faOn(){return !!fightAnimEnabled&&!faStoreOff()&&!(typeof S!=='undefined'&&S&&S.ui&&S.ui.fightAnim===0);}
  function faSetPref(on){try{if(typeof S!=='undefined'&&S){if(!S.ui||typeof S.ui!=='object')S.ui={hud:1,ctl:1,mm:1,mmShow:true,feed:1,pos:{}};S.ui.fightAnim=on?1:0;}}catch(e){}
-  try{localStorage.setItem('reign.fightAnimEnabled.v1',on?'1':'0');}catch(e){}}
+  try{localStorage.setItem('dale.fightAnimEnabled.v1',on?'1':'0');}catch(e){}}
  function faBump(n){FA.plays++;FA.byClip[n]=(FA.byClip[n]||0)+1;}
  function faSample(tab,t){
   var ft=Math.min(tab.d,Math.max(0,t))*tab.r,i0=Math.floor(ft),i1=Math.min(tab.f.length-1,i0+1),fr=ft-i0;
@@ -31830,7 +31833,7 @@ idle:{r:15,d:1.667,f:[[0.342,0.013,-0.003,-0.284,0.479,-0.134,0.331,0.175,-0.291
    restore. Flag OFF restores the shipped look completely. */
 (function () {
   var ev91Enabled = true;
-  try { ev91Enabled = localStorage.getItem('reign.ev91.v1') !== '0'; } catch (e) {}
+  try { ev91Enabled = localStorage.getItem('dale.ev91.v1') !== '0'; } catch (e) {}
   try { if (typeof S !== 'undefined' && S && S.ui && S.ui.evModels != null) ev91Enabled = !!S.ui.evModels; } catch (e) {}
 
   /* Deeplish pilot set, frozen from the v30.90 census: every P5_BUILD
@@ -32132,7 +32135,7 @@ idle:{r:15,d:1.667,f:[[0.342,0.013,-0.003,-0.284,0.479,-0.134,0.331,0.175,-0.291
     get on() { return ev91Enabled; },
     setEnabled: function (on) {
       ev91Enabled = !!on;
-      try { localStorage.setItem('reign.ev91.v1', on ? '1' : '0'); } catch (e) {}
+      try { localStorage.setItem('dale.ev91.v1', on ? '1' : '0'); } catch (e) {}
       try { if (typeof S !== 'undefined' && S && S.ui) { S.ui.evModels = ev91Enabled; if (typeof saveGame === 'function') saveGame(); } } catch (e) {}
       refresh91();
       return ev91Enabled;
@@ -32203,7 +32206,7 @@ idle:{r:15,d:1.667,f:[[0.342,0.013,-0.003,-0.284,0.479,-0.134,0.331,0.175,-0.291
    collision entry for the new Fareed's building. */
 (function () {
   var rt93Enabled = true;
-  try { rt93Enabled = localStorage.getItem('reign.rt93.v1') !== '0'; } catch (e) {}
+  try { rt93Enabled = localStorage.getItem('dale.rt93.v1') !== '0'; } catch (e) {}
   try { if (typeof S !== 'undefined' && S && S.ui && S.ui.rtTerraces != null) rt93Enabled = !!S.ui.rtTerraces; } catch (e) {}
 
   /* The Tweedale Street set, frozen from the v30.92 world audit:
@@ -32738,7 +32741,7 @@ idle:{r:15,d:1.667,f:[[0.342,0.013,-0.003,-0.284,0.479,-0.134,0.331,0.175,-0.291
     get on() { return rt93Enabled; },
     setEnabled: function (on) {
       rt93Enabled = !!on;
-      try { localStorage.setItem('reign.rt93.v1', on ? '1' : '0'); } catch (e) {}
+      try { localStorage.setItem('dale.rt93.v1', on ? '1' : '0'); } catch (e) {}
       try { if (typeof S !== 'undefined' && S && S.ui) { S.ui.rtTerraces = rt93Enabled; if (typeof saveGame === 'function') saveGame(); } } catch (e) {}
       refresh93();
       return rt93Enabled;
@@ -32944,10 +32947,10 @@ if(!window.__MI94){ (function(){
  ];
  var MI={ver:'v30.94',err:null,next:0,metKuzzo:false,done:false,restored:false,
          offer:null,offerDay:0,job:null,dazFig:null,dazLabel:null,vicLabel:null,lastGT:0,completions:0,fails:0};
- function miStoreOff(){try{return localStorage.getItem('reign.missions.v1')==='0';}catch(e){return false;}}
+ function miStoreOff(){try{return localStorage.getItem('dale.missions.v1')==='0';}catch(e){return false;}}
  function miOn(){return !!missionsEnabled&&!miStoreOff()&&!(typeof S!=='undefined'&&S&&S.ui&&S.ui.missions===0);}
  function miSetPref(on){try{if(typeof S!=='undefined'&&S&&S.ui)S.ui.missions=on?1:0;}catch(e){}
-  try{localStorage.setItem('reign.missions.v1',on?'1':'0');}catch(e){}}
+  try{localStorage.setItem('dale.missions.v1',on?'1':'0');}catch(e){}}
  /* ---------------- geography (shipped SPOT anchors, resolved live) - */
  function miSpot(street){try{for(var i=0;i<SPOTS.length;i++)if(SPOTS[i].street===street)return SPOTS[i];}catch(e){}return null;}
  function miRehanPt(){
@@ -32971,7 +32974,7 @@ if(!window.__MI94){ (function(){
  /* ---------------- restore (lazy, order-independent, read-only) ---- */
  function miRestore(){
   if(MI.restored)return;MI.restored=true;
-  try{var raw=localStorage.getItem('reign.save.v1');if(!raw)return;
+  try{var raw=localStorage.getItem('dale.save.v1');if(!raw)return;
    var p=JSON.parse(raw),sec=(p&&p.state&&p.state.sections)?p.state.sections.missions:null;
    if(sec&&sec.version===1&&sec.data&&sec.data.chain==='kuzzo'){
     var d=sec.data;
@@ -33437,7 +33440,7 @@ window.__NRVehicleState=function(){return nrVehicleAnim?{kind:nrVehicleAnim.kind
    grapple, finishers and environment combat are subsequent stages. */
 if(!window.__FK95){(function(){
  'use strict';
- var KEY='reign.fightingKick.v1',originalHit=combatApplyHit;
+ var KEY='dale.fightingKick.v1',originalHit=combatApplyHit;
  var activeSwing=-1,kickHit=false,kickSide=0,pressCount=0,hits=0,denied=0;
  var btn=null,row=null,live=false,err=null,sessionOverride=null;
  function on(){try{var val=localStorage.getItem(KEY);if(val!==null)return val!=='0';}catch(e){}
@@ -33574,8 +33577,8 @@ var R=null, panel, overlay, modeStandalone=!!window.__DALE_RACE_STANDALONE, chos
 var raceKeys=['panamera','golfb','c63','saloon','golfr','hot','coupe','suv','battered'], carNames={panamera:'Porsche Panamera Turbo',golfb:'Volkswagen Golf R · Lapiz Blue',c63:'Mercedes C63 AMG',saloon:'BMW M5 CS',golfr:'Volkswagen Golf R',hot:'Sport Hatchback',coupe:'Sport Coupé',suv:'Estate / Utility',battered:'Classic Hatchback'}, previewCache={};
 var names=['Kat','Sunny','Jam','Daz','Kyle','Mo','Riz'], colors=[0xf35752,0x27b9f0,0xffc244,0xa884ff,0x49e2a5,0xf48fd0,0xffffff], items=['TURBO','OIL','PULSE','SHIELD','OVERDRIVE','SHOCKWAVE','BRICK'];
 var cups=[{name:'Borough Cup',routes:[0,1,2]},{name:'Express Cup',routes:[3,4,5]},{name:'Dale Grand Prix',routes:[0,3,1,4,2,5]}],cup=null,profile={xp:0,credits:0,wins:0,races:0,trophies:{},paints:{},selected:'factory'},paintColors={factory:null,crimson:0xd82b40,ice:0x31c7f0,gold:0xd9a33f,midnight:0x242735};
-try{var stored=JSON.parse(localStorage.getItem('reign.streetCircuit.profile.v3')||'null');if(stored)profile=Object.assign(profile,stored);}catch(e){}
-function saveProfile(){try{localStorage.setItem('reign.streetCircuit.profile.v3',JSON.stringify(profile));}catch(e){}}
+try{var stored=JSON.parse(localStorage.getItem('dale.streetCircuit.profile.v3')||'null');if(stored)profile=Object.assign(profile,stored);}catch(e){}
+function saveProfile(){try{localStorage.setItem('dale.streetCircuit.profile.v3',JSON.stringify(profile));}catch(e){}}
 function standings(){return cup?['YOU'].concat(names).sort(function(a,b){return cup.points[b]-cup.points[a]||cup.wins[b]-cup.wins[a]||cup.last[a]-cup.last[b];}):[];}
 function classification(){return [R.driver].concat(R.bots).sort(function(a,b){var af=a===R.driver||!!a.finished,bf=b===R.driver||!!b.finished;if(af&&bf)return (a===R.driver?R.elapsed:a.finished)-(b===R.driver?R.elapsed:b.finished);if(af!==bf)return af?-1:1;return b.progress-a.progress;});}
 function begin(){cup=null;if(chosen.mode==='cup'){var c=cups[+el('dscCup').value]||cups[0];cup={def:c,index:0,points:{},wins:{},last:{}};['YOU'].concat(names).forEach(function(n,i){cup.points[n]=0;cup.wins[n]=0;cup.last[n]=i;});chosen.track=c.routes[0];}start();}
@@ -33583,7 +33586,7 @@ function advance(){if(cup&&R&&R.finished&&cup.index+1<cup.def.routes.length){cup
 function abandon(){cup=null;end(true);}
 function garage(){el('dscProfile').textContent='LV '+(1+Math.floor(profile.xp/300))+' · '+profile.credits+' CR · '+profile.wins+' WINS · '+Object.keys(profile.trophies).length+' TROPHIES';var n=el('dscPaint');n.innerHTML=Object.keys(paintColors).map(function(k){return '<option value="'+k+'">'+k.toUpperCase()+(k!=='factory'&&!profile.paints[k]?' · 150 CR':'')+'</option>';}).join('');n.disabled=chosen.car==='panamera';n.value=n.disabled?'factory':profile.selected in paintColors?profile.selected:'factory';if(n.disabled)n.options[0].textContent='FACTORY · FIXED TEXTURE';el('dscCup').disabled=chosen.mode!=='cup';el('dscTracks').disabled=chosen.mode==='cup';}
 function paint(){return chosen.car==='panamera'||paintColors[profile.selected]==null?CARS[chosen.car].defColor:paintColors[profile.selected];}
-try{best=JSON.parse(localStorage.getItem('reign.streetCircuit.records.v1')||'{}')||{};}catch(e){}
+try{best=JSON.parse(localStorage.getItem('dale.streetCircuit.records.v1')||'{}')||{};}catch(e){}
 function el(id){return document.getElementById(id);}
 function D(a,b){return Math.hypot(a[0]-b[0],a[1]-b[1]);}
 function road(n){return ROADS.find(function(r){return r.name===n;});}
@@ -33632,7 +33635,7 @@ function updateItems(dt){tickBricks(dt);var all=[R.driver].concat(R.bots);R.boxe
 function resetDriver(){if(!R||R.finished||R.count>0)return;var d=R.gate?R.gates[R.gate-1]:0,p=at(R.track,Math.min(d,R.track.len-5));placeCar(R.driver,p.x,p.z,p.dx,p.dz);R.prevX=p.x;R.prevZ=p.z;R.driver.boost=0;R.driver.slow=0;R.elapsed+=2;notify('RECOVERED · +2 SEC');}
 function tickBot(b,dt){if(b.finished)return;b.cool-=dt;if(b.item&&b.cool<=0&&(b.item!=='BRICK'||brickTarget(b))){use(b);b.cool=2+Math.random()*3;}var t=R.track,cur=Math.max(0,b.distance)%t.len,pp=at(t,cur),ahead=at(t,Math.min(t.len,cur+45)),turn=Math.acos(clamp(pp.dx*ahead.dx+pp.dz*ahead.dz,-1,1)),diff=R.difficulty==='easy'?.70:R.difficulty==='hard'?1.03:.85,base=Math.min(CARS[b.key].speed*.65,205)*b.pace*diff;var catchup=clamp((R.driver.progress-b.progress)/800,-.10,.12);var v=base*(1+catchup)*(1-.55*turn/Math.PI)*(b.boost>0?1.32:1)*(b.slow>0?.45:1);b.botSpeed+=(v-b.botSpeed)*(1-Math.exp(-dt*(turn>.35?5:2.5)));v=b.botSpeed;b.distance+=v*dt;var total=R.laps*t.len;if(b.distance>=total){b.distance=total;b.finished=R.elapsed;}var dd=b.finished?t.len:Math.max(0,b.distance)%t.len,q=at(t,dd),q2=at(t,Math.min(t.len,dd+12));var laneTarget=b.lane*.65+Math.sin(R.elapsed*.45+b.pace*20)*2.5;b.laneNow+=(laneTarget-b.laneNow)*(1-Math.exp(-dt*2));var lane=b.laneNow; b.x=q.x+q.dz*lane+q.dx*Math.min(0,b.distance);b.z=q.z-q.dx*lane+q.dz*Math.min(0,b.distance);b.h=Math.atan2(q2.x-q.x,-(q2.z-q.z));if(Math.abs(q2.x-q.x)+Math.abs(q2.z-q.z)<.1)b.h=Math.atan2(q.dx,-q.dz);b.mesh.position.set(b.x,0,b.z);b.mesh.rotation.y=carMeshRotY(b.h);rollWheels(b.mesh,v*dt,0);b.progress=b.distance;}
 function rank(){if(R.finished)return classification().indexOf(R.driver)+1;return 1+R.bots.filter(function(b){return b.finished||b.progress>R.driver.progress;}).length;}
-function complete(){R.finished=true;var order=classification(),pos=order.indexOf(R.driver)+1,key=R.track.name+'|'+chosen.car+'|'+R.laps+'|'+R.mode,previous=best[key];if(!previous||R.elapsed<previous){best[key]=R.elapsed;try{localStorage.setItem('reign.streetCircuit.records.v1',JSON.stringify(best));}catch(e){}}el('dscResult').textContent=R.mode==='trial'?'TIME SET':pos===1?'VICTORY!':ordinal(pos)+' PLACE';el('dscResultSub').textContent=R.elapsed.toFixed(2)+' s'+(!previous||R.elapsed<previous?' · NEW PERSONAL BEST':' · Best '+previous.toFixed(2)+' s');el('dscStanding').innerHTML='<small>CLASSIFICATION AT FINISH</small>'+order.map(function(b,i){return '<div><b>'+ (i+1)+'</b> '+(b===R.driver?'YOU':b.name)+' · '+carNames[b.key]+(b.finished?' · '+b.finished.toFixed(1)+'s':'')+'</div>';}).join('')+'<small>BEST LAP '+(isFinite(R.bestLap)?R.bestLap.toFixed(2)+'s':'—')+'</small>';profile.races++;if(R.mode!=='trial'&&pos===1)profile.wins++;var xp=R.mode==='trial'?35:Math.max(25,115-pos*10),reward=R.mode==='trial'?30:Math.max(20,100-pos*10);profile.xp+=xp;profile.credits+=reward;var extra='<div>+'+xp+' XP · +'+reward+' CR</div>';if(cup){var pts=[15,12,10,8,6,4,2,1];order.forEach(function(b,i){var n=b===R.driver?'YOU':b.name;cup.points[n]+=pts[i];cup.last[n]=i;if(!i)cup.wins[n]++;});var ranks=standings(),final=cup.index===cup.def.routes.length-1;if(final&&ranks[0]==='YOU'){profile.trophies[cup.def.name]=true;profile.credits+=150;extra+='<div>CHAMPION BONUS · +150 CR</div>';}extra+='<small>'+cup.def.name.toUpperCase()+' · '+(cup.index+1)+'/'+cup.def.routes.length+'</small>'+ranks.map(function(n,i){return '<div>'+ (i+1)+' · '+n+' — '+cup.points[n]+' pts</div>';}).join('');el('dscAgain').textContent=final?'CUP COMPLETE ›':'NEXT ROUND ›';if(final)el('dscResult').textContent=ranks[0]==='YOU'?'CUP CHAMPION!':ordinal(ranks.indexOf('YOU')+1)+' OVERALL';}else el('dscAgain').textContent='RACE AGAIN';el('dscStanding').insertAdjacentHTML('beforeend',extra);saveProfile();el('dscFinish').style.display='flex';resetInput();}
+function complete(){R.finished=true;var order=classification(),pos=order.indexOf(R.driver)+1,key=R.track.name+'|'+chosen.car+'|'+R.laps+'|'+R.mode,previous=best[key];if(!previous||R.elapsed<previous){best[key]=R.elapsed;try{localStorage.setItem('dale.streetCircuit.records.v1',JSON.stringify(best));}catch(e){}}el('dscResult').textContent=R.mode==='trial'?'TIME SET':pos===1?'VICTORY!':ordinal(pos)+' PLACE';el('dscResultSub').textContent=R.elapsed.toFixed(2)+' s'+(!previous||R.elapsed<previous?' · NEW PERSONAL BEST':' · Best '+previous.toFixed(2)+' s');el('dscStanding').innerHTML='<small>CLASSIFICATION AT FINISH</small>'+order.map(function(b,i){return '<div><b>'+ (i+1)+'</b> '+(b===R.driver?'YOU':b.name)+' · '+carNames[b.key]+(b.finished?' · '+b.finished.toFixed(1)+'s':'')+'</div>';}).join('')+'<small>BEST LAP '+(isFinite(R.bestLap)?R.bestLap.toFixed(2)+'s':'—')+'</small>';profile.races++;if(R.mode!=='trial'&&pos===1)profile.wins++;var xp=R.mode==='trial'?35:Math.max(25,115-pos*10),reward=R.mode==='trial'?30:Math.max(20,100-pos*10);profile.xp+=xp;profile.credits+=reward;var extra='<div>+'+xp+' XP · +'+reward+' CR</div>';if(cup){var pts=[15,12,10,8,6,4,2,1];order.forEach(function(b,i){var n=b===R.driver?'YOU':b.name;cup.points[n]+=pts[i];cup.last[n]=i;if(!i)cup.wins[n]++;});var ranks=standings(),final=cup.index===cup.def.routes.length-1;if(final&&ranks[0]==='YOU'){profile.trophies[cup.def.name]=true;profile.credits+=150;extra+='<div>CHAMPION BONUS · +150 CR</div>';}extra+='<small>'+cup.def.name.toUpperCase()+' · '+(cup.index+1)+'/'+cup.def.routes.length+'</small>'+ranks.map(function(n,i){return '<div>'+ (i+1)+' · '+n+' — '+cup.points[n]+' pts</div>';}).join('');el('dscAgain').textContent=final?'CUP COMPLETE ›':'NEXT ROUND ›';if(final)el('dscResult').textContent=ranks[0]==='YOU'?'CUP CHAMPION!':ordinal(ranks.indexOf('YOU')+1)+' OVERALL';}else el('dscAgain').textContent='RACE AGAIN';el('dscStanding').insertAdjacentHTML('beforeend',extra);saveProfile();el('dscFinish').style.display='flex';resetInput();}
 function ordinal(n){return n+(n===1?'ST':n===2?'ND':n===3?'RD':'TH');}
 function renderMap(){var c=el('dscMap'),g=c.getContext('2d'),t=R.track,p=t.p,xs=p.map(function(a){return a[0];}),zs=p.map(function(a){return a[1];}),xmin=Math.min.apply(null,xs),zmin=Math.min.apply(null,zs),w=Math.max.apply(null,xs)-xmin,h=Math.max.apply(null,zs)-zmin,k=106/Math.max(w,h,1);function pt(x,z){return [9+(x-xmin)*k+(106-w*k)/2,9+(z-zmin)*k+(106-h*k)/2];}g.clearRect(0,0,124,124);g.strokeStyle='#d1e3e3';g.lineWidth=4;g.lineJoin='round';g.beginPath();p.forEach(function(a,i){var q=pt(a[0],a[1]);if(i)g.lineTo(q[0],q[1]);else g.moveTo(q[0],q[1]);});g.stroke();[R.driver].concat(R.bots).forEach(function(a,i){var q=pt(a.x,a.z);g.fillStyle=i?'#f0b54f':'#39ffb6';g.beginPath();g.arc(q[0],q[1],i?3:5,0,Math.PI*2);g.fill();});}
 function frame(dt){if(!R||!R.driver)return;var r=R,p=r.driver;r.hidden.forEach(function(a){a[0].visible=false;});dt=Math.min(.035,Math.max(0,dt));if(!r.paused&&!r.finished){if(r.count>0){r.count=Math.max(0,r.count-dt);if(r.count<1.1&&(controls.throttle||controls.keys.w||controls.keys.arrowup))r.launchHold+=dt;else if(r.count<1.1)r.launchHold=0;if(r.count===0){if(r.launchHold>=.3&&r.launchHold<=.85){p.boost=1.65;notify('PERFECT LAUNCH!');}else notify('GO!');}}else{r.elapsed+=dt;[p].concat(r.bots).forEach(function(b){['boost','slow','shield'].forEach(function(k){b[k]=Math.max(0,b[k]-dt);});});racePhysics(p,dt);var drafting=r.bots.some(function(b){var dx=b.x-p.x,dz=b.z-p.z,f=dx*Math.sin(p.h)-dz*Math.cos(p.h),side=dx*Math.cos(p.h)+dz*Math.sin(p.h);return !b.finished&&f>26&&f<95&&Math.abs(side)<13&&speed(p)>80;});r.draft=clamp(r.draft+(drafting?dt:-dt*1.8),0,1.35);if(r.draft>=1.35){p.boost=Math.max(p.boost,.85);r.draft=0;notify('SLIPSTREAM!');}r.bots.forEach(function(b){tickBot(b,dt);});updateItems(dt);var target=at(r.track,r.gates[r.gate]);if(segDist(target.x,target.z,r.prevX,r.prevZ,p.x,p.z)<26){r.gate++;if(r.gate>=r.gates.length){r.bestLap=Math.min(r.bestLap,r.elapsed-r.lapStart);r.lapStart=r.elapsed;r.lap++;r.gate=0;if(r.lap>=r.laps){p.progress=r.track.len*r.laps;complete();}else notify('LAP '+(r.lap+1)+' / '+r.laps);}if(!r.finished)gateUpdate();}r.prevX=p.x;r.prevZ=p.z;if(!r.finished){var before=r.gate?r.gates[r.gate-1]:0,after=r.gates[r.gate];var a=at(r.track,before),b=at(r.track,after),vx=b.x-a.x,vz=b.z-a.z,frac=clamp(((p.x-a.x)*vx+(p.z-a.z)*vz)/(vx*vx+vz*vz||1),0,.99);p.progress=r.lap*r.track.len+before+(after-before)*frac;var off=projection(r.track,p.x,p.z).off;if(off>125){r.offT=(r.offT||0)+dt;if(r.offT>2.3){r.offT=0;resetDriver();}}else r.offT=0;}
@@ -34046,7 +34049,7 @@ window.__daleBoot.onReady(function(){
 function $(id){return document.getElementById(id);}
 function on(el,ev,fn){if(el)el.addEventListener(ev,fn);}
 var OPV=[0.6,0.75,0.9,1],OPN=['60%','75%','90%','100%'];
-var PREF_KEY='reign.hudPrefs.v1';
+var PREF_KEY='dale.hudPrefs.v1';
 var prefs=null;try{var pr=localStorage.getItem(PREF_KEY);if(pr)prefs=JSON.parse(pr);}catch(e){prefs=null;}
 var lastS=null,lastSnap='';
 function ui(){return (typeof S!=='undefined'&&S&&S.ui&&typeof S.ui==='object')?S.ui:null;}
@@ -34318,7 +34321,7 @@ body.feed41-shut #sideFeed .feedItem:not(.pin){display:none;}
    the shipped feed, its timers and the h24 alert capture are untouched) */
 (function(){try{
  var f=document.getElementById('sideFeed');if(!f)return;
- var KEY='reign.hudPrefs.v1';
+ var KEY='dale.hudPrefs.v1';
  var shut=false,lastAct=Date.now();
  function readStored(){try{return JSON.parse(localStorage.getItem(KEY)||'{}')||{};}catch(e){return{};}}
  function writePref(){try{var p=readStored();p.h41feed=shut;localStorage.setItem(KEY,JSON.stringify(p));}catch(e){}}
@@ -34464,5 +34467,6 @@ body.driving #fightBtns #fk95KickBtn{display:none!important;}
 
 </style>
 <script>window.__NORTHERN_REIGN={version:"1.0",base:"v30.94 final polish + v30.95 kick + Street Circuit V4"};</script>
+<script>if("serviceWorker" in navigator&&window.isSecureContext){window.addEventListener("load",function(){navigator.serviceWorker.register("./sw.js").catch(function(e){console.warn("Offline cache unavailable",e);});});}</script>
 </body>
 </html>
