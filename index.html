@@ -31003,6 +31003,155 @@ window.__HM80={version:'v30.82',on:hmOn,setEnabled:hmSetEnabled,refresh:hmRefres
  pivots:function(){var u=(typeof player!=='undefined'&&player&&player.fig)?player.fig.userData:null;return (u&&u.hm)?u.hm.pivots:null;}};
 })();}
 /* ================= /v30.82 — MY CHARACTER: THE TRIPO FIGURE (__HM80) ================= */
+/* =====================================================================
+   NR 1.3 — PLAYER CHARACTER: THE PHOTO OUTFIT, DETAILED (__NR13)
+   ---------------------------------------------------------------------
+   The user's direction (2026-11-24): "Make my character model" — with
+   his photo: shiny black North Face puffer worn open over a grey
+   hoodie (hood UP, white drawstrings), grey Nike joggers, white/grey
+   Air Max trainers, full dark beard. The v30.82 hero body already IS
+   that authored outfit (it was segmented from his figure in this exact
+   fit, face likeness in the head islands); what the flat texture could
+   not carry at game scale were three details, and this layer adds
+   exactly those three, as geometry/material work on the hero body only:
+
+   1. CHEST EMBLEM — the white North Face-style mark (half-dome + micro
+      text) as a small canvas-textured plane seated on the wearer's
+      LEFT chest of the puffer (model +X: hmSyncPose's mirror mapping
+      puts the figure's anatomical left on +X). Seated by a raycast
+      against the Chest pivot's own geometry, baked fallback included.
+   2. DRAWSTRINGS — two real white cords (thin cylinders + aglet tips)
+      hanging from the hood base over the hoodie front, riding the
+      Chest pivot next to the emblem.
+   3. PUFFER SHEEN — a roughness map derived from the hero's own atlas:
+      near-black texels (the puffer panels) drop to roughness ~0.40 so
+      the jacket catches the light like the photo's glossy shell, while
+      skin, hoodie fleece, joggers and trainers keep the shipped 0.85.
+      Applied to the hero material only; if the payload ever falls back
+      to vertex colours (no map), the sheen step simply never applies.
+
+   INTEGRATION: the hero layer (v30.82) is closure-scoped, so this layer
+   works through its published surface — window.__HM80.fig()/pivots()
+   for the body, and a chained wrapper on the global applyOutfitToFigure
+   (the same hook the hero layer itself uses) plus a boot retry loop.
+   Everything hangs inside u.hm.outer on the Chest pivot, so it shows
+   and hides WITH the hero body, inherits the pose sync for free, and
+   never touches NPCs, the shipped TS/CM/procedural bodies, gameplay,
+   the wardrobe data or saves. Hero layer OFF or failed = this layer
+   does nothing. Debug: window.__NR13 (state / refresh).
+   ===================================================================== */
+var __NR13={version:'NR1.3',built:false,sheen:false,err:null};
+(function(){
+function nr13EmblemTexture(){
+ var c=document.createElement('canvas');c.width=256;c.height=192;var x=c.getContext('2d');
+ x.clearRect(0,0,256,192);
+ x.fillStyle='#f4f6f7';x.strokeStyle='#f4f6f7';
+ x.font='900 31px Arial, sans-serif';x.textBaseline='top';
+ x.fillText('THE',30,20);x.fillText('NORTH',30,57);x.fillText('FACE',30,94);
+ var cx=198,cy=120,R=50;
+ x.lineWidth=13;x.beginPath();x.arc(cx,cy,R,Math.PI,0);x.stroke();
+ x.lineWidth=10;
+ [-25,0,25].forEach(function(dx){x.beginPath();x.moveTo(cx+dx,cy);x.lineTo(cx+dx,cy-Math.sqrt(R*R-dx*dx)+4);x.stroke();});
+ x.lineWidth=12;x.beginPath();x.moveTo(cx-R-4,cy);x.lineTo(cx+R+4,cy);x.stroke();
+ var t=new THREE.CanvasTexture(c);
+ if(THREE.sRGBEncoding!==undefined)t.encoding=THREE.sRGBEncoding;
+ else if(THREE.SRGBColorSpace!==undefined&&'colorSpace' in t)t.colorSpace=THREE.SRGBColorSpace;
+ t.anisotropy=4;
+ return t;
+}
+var nr13Rc=null;
+function nr13FrontZ(chest,lx,ly,fallback){
+ try{
+  if(!nr13Rc)nr13Rc=new THREE.Raycaster();
+  chest.updateMatrixWorld(true);
+  var origin=chest.localToWorld(new THREE.Vector3(lx,ly,2));
+  var zAxis=new THREE.Vector3(0,0,1).transformDirection(chest.matrixWorld);
+  nr13Rc.set(origin,zAxis.negate());
+  var hits=nr13Rc.intersectObjects(chest.children,true);
+  if(hits&&hits.length)return chest.worldToLocal(hits[0].point.clone()).z;
+ }catch(e){}
+ return fallback;
+}
+function nr13Build(u){
+ var P=u.hm&&u.hm.pivots;if(!P||!P.Chest)return false;
+ var chest=P.Chest;
+ var grp=new THREE.Group();grp.name='NR13Details';
+ /* 1 — chest emblem on the wearer's left chest (model +X) */
+ var ez=nr13FrontZ(chest,0.128,0.205,0.071);
+ var emb=new THREE.Mesh(new THREE.PlaneGeometry(0.082,0.062),
+  new THREE.MeshStandardMaterial({map:nr13EmblemTexture(),transparent:true,roughness:.55,metalness:0,
+   polygonOffset:true,polygonOffsetFactor:-2,depthWrite:false}));
+ emb.position.set(0.128,0.205,ez+0.008);
+ emb.rotation.set(-0.10,0.12,0);
+ emb.renderOrder=4;
+ grp.add(emb);
+ /* 2 — drawstrings from the hood base over the hoodie front */
+ var sm=new THREE.MeshStandardMaterial({color:0xf2f3f4,roughness:.6,metalness:0});
+ [-0.034,0.034].forEach(function(sx,i){
+  var mz=nr13FrontZ(chest,sx,0.22,0.072);
+  var top=0.315,len=0.16;
+  var cord=new THREE.Mesh(new THREE.CylinderGeometry(0.0055,0.0055,len,6),sm);
+  cord.position.set(sx,top-len/2,mz+0.011);
+  cord.rotation.set(0.06,0,(i===0?1:-1)*0.045);
+  grp.add(cord);
+  var tip=new THREE.Mesh(new THREE.SphereGeometry(0.0075,8,6),sm);
+  tip.position.set(sx+(i===0?-1:1)*0.0035,top-len,mz+0.011+Math.sin(0.06)*len);
+  grp.add(tip);
+ });
+ chest.add(grp);
+ u.hm.nr13=grp;__NR13.built=true;
+ return true;
+}
+function nr13Sheen(u){
+ var mats=[];
+ u.hm.outer.traverse(function(o){if(o.isMesh&&o.material&&o.material.map&&mats.indexOf(o.material)<0)mats.push(o.material);});
+ if(!mats.length)return false;
+ var img=mats[0].map.image;
+ if(!img||!img.complete||!img.naturalWidth)return false; /* atlas still decoding — retry on a later tick */
+ var S=512,c=document.createElement('canvas');c.width=S;c.height=S;var x=c.getContext('2d');
+ x.drawImage(img,0,0,S,S);
+ var d=x.getImageData(0,0,S,S),px=d.data;
+ for(var i=0;i<px.length;i+=4){
+  var lum=(0.2126*px[i]+0.7152*px[i+1]+0.0722*px[i+2])/255;
+  var rough=lum<0.10?0.40:(lum>0.24?0.85:0.40+0.45*((lum-0.10)/0.14));
+  px[i]=0;px[i+1]=Math.round(rough*255);px[i+2]=0;px[i+3]=255;
+ }
+ x.putImageData(d,0,0);
+ var rt=new THREE.CanvasTexture(c);rt.flipY=false;
+ mats.forEach(function(m){m.roughnessMap=rt;m.roughness=1.0;m.needsUpdate=true;});
+ __NR13.sheen=true;
+ return true;
+}
+function nr13Fig(){try{return (window.__HM80&&__HM80.fig)?__HM80.fig():null;}catch(e){return null;}}
+function nr13Tick(){
+ try{
+  var fig=nr13Fig();if(!fig||!fig.userData)return false;
+  var u=fig.userData;if(!u.hm)return false;
+  if(!u.hm.nr13)nr13Build(u);
+  if(u.hm.nr13&&!__NR13.sheen)nr13Sheen(u);
+  return !!(__NR13.built&&__NR13.sheen);
+ }catch(e){__NR13.err=String((e&&e.message)||e);return false;}
+}
+/* hooks: chain the global outfit hook (fires hmRefresh inside the hero
+   layer) and the hero layer's own published refresh, then poll at boot
+   until both steps have landed (the atlas decodes async). */
+if(typeof applyOutfitToFigure==='function'){
+ var nr13OrigApply=applyOutfitToFigure;
+ applyOutfitToFigure=function(){nr13OrigApply();nr13Tick();};
+}
+if(window.__HM80&&__HM80.refresh){
+ var nr13OrigRefresh=__HM80.refresh;
+ __HM80.refresh=function(){var v=nr13OrigRefresh.apply(null,arguments);nr13Tick();return v;};
+}
+var nr13Tries=0;
+var nr13Iv=setInterval(function(){nr13Tries++;if(nr13Tick()||nr13Tries>120)clearInterval(nr13Iv);},250);
+window.__NR13={version:'NR1.3',refresh:nr13Tick,
+ state:function(){var fig=nr13Fig();return {version:__NR13.version,built:__NR13.built,sheen:__NR13.sheen,err:__NR13.err,
+  heroOn:!!(fig&&fig.userData&&fig.userData.hmOn),
+  details:!!(fig&&fig.userData&&fig.userData.hm&&fig.userData.hm.nr13)};}};
+})();
+/* ================= /NR 1.3 — PLAYER CHARACTER: THE PHOTO OUTFIT, DETAILED ================= */
+
 
 /* =====================================================================
    v30.83 — __PN83 "THE PANAMERA" (the user's direction, 2026-11-19:
