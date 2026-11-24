@@ -33793,6 +33793,138 @@ function nrVehicleTick(dt){var a=nrVehicleAnim;if(!a)return;
 
 window.__NRVehicleBegin=nrVehicleBegin;
 window.__NRVehicleState=function(){return nrVehicleAnim?{kind:nrVehicleAnim.kind,t:nrVehicleAnim.t}:null;};
+/* =====================================================================
+   NR 1.4 — VEHICLE ENTRY/EXIT ANIMATION, COMPLETED (__NR14)
+   ---------------------------------------------------------------------
+   The shipped presentation block above (nrVehicleBegin / nrVehicleTick /
+   nrVehicleReset) already glides the hero figure seat <-> door <-> kerb
+   with a sit-pivot-step pose through the figure's own pose sync
+   (hmSyncPose / tsSyncPose / cmSyncPose), and input is already locked
+   while it runs: daleInputAllowed() is false whenever nrVehicleAnim is
+   active and the frame loop neutralises inputs every frame. This layer
+   completes the presentation to spec WITHOUT editing the shipped
+   functions' text — it wraps them, in the file's established idiom:
+   1. TIMING — durations moved into the 0.6–0.9 s band
+      (entry .56 -> .78, exit .62 -> .84).
+   2. APPROACH — an entry that starts away from the door point first
+      walks the figure to the door on the same pose channels (a short
+      walk cycle), then hands over to the shipped door -> seat path;
+      exits keep the shipped seat -> door -> kerb path unchanged.
+   3. LIVE ANCHOR — the seat/door points follow the car's CURRENT
+      position each frame (nrVehicleBegin's own heading math), so a
+      nudged car cannot strand the figure at a stale spot; a car that
+      ends up 60+ units from the standing spot bails to the end state.
+   4. HARD TIMEOUT — a wall-clock watchdog (setInterval, independent
+      of the frame loop) force-completes an animation whose own game
+      clock has been FROZEN for 10 s via nrVehicleReset, snapping to
+      the correct end state. Progress-based, not age-based: a slow
+      device whose frames take seconds keeps its animation (game time
+      accrues at most .05 s per frame, so a healthy animation can
+      legitimately span many wall seconds); only a truly stalled
+      sequence — tick throwing, loop dead — is snapped. The sequence
+      can never soft-lock.
+   5. MISSED ENTRY — the one player-driven entry that never called
+      nrVehicleBegin (walking up to your car after a 'station' exit —
+      custody release / station return) is caught by a watcher on the
+      foot -> car flip and given the same animation from the last
+      on-foot position. Scripted flips (fight, dead-car, migration)
+      keep the shipped instant swap, and the wrapper is a no-op while
+      a Street Circuit race is active (races keep their instant swap;
+      the race layer owns its driver).
+   DOORS — makeCarMesh builds every car body as a single box: no car
+   in this game has an articulated door mesh or pivot, so there is no
+   door to swing. The step-in runs without one rather than faking it.
+   Debug: window.__NR14 (state).
+   ===================================================================== */
+var NR14={begins:0,watchdogs:0,synths:0,err:null};
+(function(){
+ var T_IN=.78,T_OUT=.84,APPROACH_T=.34,STALL_MS=10000;
+ var origBegin=nrVehicleBegin,origTick=nrVehicleTick;
+ function raceOn(){try{return !!(window.__DALE_RACE&&__DALE_RACE.active());}catch(e){return false;}}
+ function anchor(a){
+  var m=a.car.position,dx=m.x-a.walk.x,dz=m.z-a.walk.z;
+  if(dx*dx+dz*dz>60*60)return false;
+  var rx=Math.cos(a.h),rz=Math.sin(a.h),fx=Math.sin(a.h),fz=-Math.cos(a.h),w=carSpec().w;
+  a.seat.x=m.x+rx*a.side*Math.min(7,w*.32)+fx*3;a.seat.z=m.z+rz*a.side*Math.min(7,w*.32)+fz*3;
+  a.door.x=m.x+rx*a.side*(w*.5+4)+fx*3;a.door.z=m.z+rz*a.side*(w*.5+4)+fz*3;
+  a.carX=m.x;a.carZ=m.z;return true;
+ }
+ nrVehicleBegin=function(kind,x,z){
+  if(raceOn())return;
+  var prev=nrVehicleAnim;
+  origBegin(kind,x,z);
+  var a=nrVehicleAnim;
+  if(a&&a!==prev&&a.kind===kind){
+   a.duration=(kind==='in')?T_IN:T_OUT;
+   a.carX=a.car.position.x;a.carZ=a.car.position.z;
+   if(kind==='in'){
+    var dx=x-a.door.x,dz=z-a.door.z;
+    if(dx*dx+dz*dz>15*15){a.nr14ap={t:0,dur:APPROACH_T,fx:x,fz:z};a.duration=T_IN-APPROACH_T;}
+   }
+   NR14.begins++;
+  }
+ };
+ window.__NRVehicleBegin=nrVehicleBegin;
+ nrVehicleTick=function(dt){
+  var a=nrVehicleAnim;
+  if(a&&a.car){
+   if(a.car.position.x!==a.carX||a.car.position.z!==a.carZ){if(!anchor(a)){nrVehicleReset();return;}}
+   if(a.nr14ap){
+    if(!S||S!==a.state||S.day!==a.day||custody||arrestSeq||player.mesh!==a.car||footMode){nrVehicleReset();return;}
+    var ap=a.nr14ap;ap.t+=Math.max(0,dt);
+    var lt=Math.min(1,ap.t/ap.dur),sm=lt*lt*(3-2*lt);
+    var f=player.fig,u=f.userData;
+    var x=ap.fx+(a.door.x-ap.fx)*sm,z=ap.fz+(a.door.z-ap.fz)*sm;
+    f.visible=true;f.position.set(x,0,z);
+    f.rotation.y=Math.atan2(a.door.x-ap.fx,a.door.z-ap.fz)+Math.PI;
+    u.body.position.y=0;u.body.rotation.x=0;u.body.rotation.z=0;
+    var sw=Math.sin(Math.PI*2*lt)*.38;
+    u.legL.hip.rotation.x=sw;u.legR.hip.rotation.x=-sw;
+    u.legL.shin.rotation.x=.20;u.legR.shin.rotation.x=.20;
+    u.armL.sh.rotation.x=-sw*.7;u.armR.sh.rotation.x=sw*.7;
+    u.armL.fore.rotation.x=0;u.armR.fore.rotation.x=0;
+    if(u.hmOn)hmSyncPose(f);else if(u.glbOn)tsSyncPose(f);else if(u.cmbOn)cmSyncPose(f);
+    if(lt>=1){a.walk.x=a.door.x;a.walk.z=a.door.z;a.nr14ap=null;}
+    return;
+   }
+  }
+  origTick(dt);
+ };
+ /* hard-timeout watchdog: wall clock, independent of the frame loop.
+    Fires only when the animation's own clock has stopped advancing —
+    a live-but-slow animation (long frames) is never cut short. */
+ setInterval(function(){
+  try{
+   var a=nrVehicleAnim;if(!a)return;
+   if(a.wdWall===undefined){a.wdT=a.t;a.wdWall=Date.now();}
+   if(a.t!==a.wdT){a.wdT=a.t;a.wdWall=Date.now();}
+   if(Date.now()-a.wdWall>STALL_MS){NR14.watchdogs++;nrVehicleReset();}
+  }catch(e){NR14.err='watchdog:'+String(e&&e.message||e);}
+ },250);
+ /* missed-entry watcher: 'station' walk-up entries flip foot -> car
+    with no nrVehicleBegin call — give them the same animation */
+ var lastFoot=null,wasFoot=false;
+ setInterval(function(){
+  try{
+   if(footMode){lastFoot={x:footMode.x,z:footMode.z,reason:footMode.reason};wasFoot=true;return;}
+   if(wasFoot){
+    wasFoot=false;
+    if(lastFoot&&lastFoot.reason==='station'&&!nrVehicleAnim&&!raceOn()
+       &&S&&S.playing&&!S.paused&&!custody&&!arrestSeq
+       &&player&&player.mesh
+       &&Math.hypot(lastFoot.x-player.mesh.position.x,lastFoot.z-player.mesh.position.z)<=42){
+     nrVehicleBegin('in',lastFoot.x,lastFoot.z);
+     if(nrVehicleAnim)NR14.synths++;
+    }
+   }
+  }catch(e){NR14.err='watcher:'+String(e&&e.message||e);}
+ },100);
+ window.__NR14={version:'NR1.4',
+  state:function(){var a=nrVehicleAnim;return {version:'NR1.4',begins:NR14.begins,watchdogs:NR14.watchdogs,synths:NR14.synths,err:NR14.err,
+   active:a?{kind:a.kind,t:Math.round(a.t*100)/100,duration:a.duration,approach:!!a.nr14ap}:null};}};
+})();
+/* ================= /NR 1.4 — VEHICLE ENTRY/EXIT ANIMATION ================= */
+
 /* ================= v30.95 — FIGHTING PROGRAMME STAGE 2A: KICK (__FK95) =================
    Append-only layer INSIDE the shipped main IIFE to reach its scoped combat
    engine, without changing any original function's text or data tables.
